@@ -1,74 +1,63 @@
-import React, { Component } from "react";
-import { Link } from "react-router-dom";
-import axios from "axios";
+import React, { useState, useEffect } from 'react';
+import axios from 'axios';
 
-class UserList extends Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      users: [],
-      error: null,
+const UserList = () => {
+  const [users, setUsers] = useState([]);
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    const fetchUsers = async () => {
+      try {
+        const response = await axios.get('https://jsonplaceholder.typicode.com/users');
+        setUsers(response.data);
+      } catch (error) {
+        setError('Failed to fetch users');
+      }
     };
-  }
 
-  componentDidMount() {
-    this.fetchUsers();
-  }
+    fetchUsers();
+  }, []);
 
-  fetchUsers = async () => {
+  const handleDelete = async (userId) => {
     try {
-      const response = await axios.get("https://jsonplaceholder.typicode.com/users");
-      this.setState({ users: response.data });
+      await axios.delete(`https://jsonplaceholder.typicode.com/users/${userId}`);
+      setUsers(users.filter((user) => user.id !== userId));
     } catch (error) {
-      this.setState({ error: "Failed to fetch users." });
+      setError('Failed to delete user');
     }
   };
 
-  handleDelete = async (id) => {
-    try {
-      await axios.delete(`https://jsonplaceholder.typicode.com/users/${id}`);
-      this.setState({ users: this.state.users.filter((user) => user.id !== id) });
-    } catch (error) {
-      this.setState({ error: "Failed to delete user." });
-    }
-  };
-
-  render() {
-    const { users, error } = this.state;
-    return (
-      <div>
-        {error && <p className="text-red-500">{error}</p>}
-        <Link to="/add" className="bg-blue-500 text-white px-4 py-2 rounded mb-4 inline-block">Add User</Link>
-        <table className="table-auto w-full mt-4">
-          <thead>
-            <tr>
-              <th>ID</th>
-              <th>First Name</th>
-              <th>Last Name</th>
-              <th>Email</th>
-              <th>Department</th>
-              <th>Actions</th>
+  return (
+    <div>
+      <h2>User List</h2>
+      {error && <p className="error">{error}</p>}
+      <table>
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Name</th>
+            <th>Email</th>
+            <th>Department</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {users.map((user) => (
+            <tr key={user.id}>
+              <td>{user.id}</td>
+              <td>{`${user.name}`}</td>
+              <td>{user.email}</td>
+              <td>{/* Assuming Department is not available in the API */}</td>
+              <td>
+                <button>Edit</button>
+                <button onClick={() => handleDelete(user.id)}>Delete</button>
+              </td>
             </tr>
-          </thead>
-          <tbody>
-            {users.map((user) => (
-              <tr key={user.id}>
-                <td>{user.id}</td>
-                <td>{user.name.split(" ")[0]}</td>
-                <td>{user.name.split(" ")[1] || ""}</td>
-                <td>{user.email}</td>
-                <td>{user.company.name}</td>
-                <td>
-                  <Link to={`/edit/${user.id}`} className="text-blue-500 mr-2">Edit</Link>
-                  <button onClick={() => this.handleDelete(user.id)} className="text-red-500">Delete</button>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
-    );
-  }
-}
+          ))}
+        </tbody>
+      </table>
+    </div>
+  );
+};
 
 export default UserList;
