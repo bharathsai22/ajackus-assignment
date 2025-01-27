@@ -1,10 +1,12 @@
+// Imports necessary libraries: React, useState, useEffect, and axios
+
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 
-const UserList = () => {
+const UserList = ({ onEdit }) => {
   const [users, setUsers] = useState([]);
   const [error, setError] = useState(null);
-
+  // Fetches user data on component mount using useEffect hook
   useEffect(() => {
     const fetchUsers = async () => {
       try {
@@ -17,7 +19,7 @@ const UserList = () => {
 
     fetchUsers();
   }, []);
-
+// Handles user deletion functionality
   const handleDelete = async (userId) => {
     try {
       await axios.delete(`https://jsonplaceholder.typicode.com/users/${userId}`);
@@ -26,7 +28,7 @@ const UserList = () => {
       setError('Failed to delete user');
     }
   };
-
+  // Renders the user list component
   return (
     <div>
       <h2>User List</h2>
@@ -49,7 +51,7 @@ const UserList = () => {
               <td>{user.email}</td>
               <td>{/* Assuming Department is not available in the API */}</td>
               <td>
-                <button>Edit</button>
+                <button onClick={() => onEdit(user)}>Edit</button>
                 <button onClick={() => handleDelete(user.id)}>Delete</button>
               </td>
             </tr>

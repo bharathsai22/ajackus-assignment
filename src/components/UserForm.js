@@ -2,17 +2,17 @@ import React, { useState } from 'react';
 import axios from 'axios';
 
 const UserForm = ({ isAdd, user, onSubmit }) => {
+      // Defines state variables to manage form input values
   const [firstName, setFirstName] = useState(isAdd ? '' : user.name);
   const [email, setEmail] = useState(isAdd ? '' : user.email);
-  // ... other fields
-
+  // Handles form submission
   const handleSubmit = async (event) => {
     event.preventDefault();
 
     const newUser = {
       name: firstName,
       email: email,
-      // ... other fields
+      
     };
 
     try {
@@ -26,7 +26,7 @@ const UserForm = ({ isAdd, user, onSubmit }) => {
       console.error('Error saving user:', error);
     }
   };
-
+  // Renders the user form component
   return (
     <form onSubmit={handleSubmit}>
       <div>
